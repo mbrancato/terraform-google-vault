@@ -69,7 +69,7 @@ module "vault" {
 
 After creating the resources, the Vault instance may be initialized.
 
-Set the `VAULT_ADDR` environment variable. See [Vault URL](#Vault%20URL).
+Set the `VAULT_ADDR` environment variable. See [Vault URL](#vault-url).
 
 ```
 $ export VAULT_ADDR=https://vault-jsn3uj5s1c-sg.a.run.app
