@@ -79,10 +79,11 @@ resource "google_cloud_run_service" "default" {
 
   template {
     spec {
+      service_account_name  = google_service_account.vault.email
       container_concurrency = 1
       containers {
         # Specifying args seems to require the command / entrypoint
-        image   = "us.gcr.io/vault-226618/vault:${var.vault_version}"
+        image   = var.vault_image
         command = ["/usr/local/bin/docker-entrypoint.sh"]
         args    = ["server"]
 
@@ -99,11 +100,31 @@ resource "google_cloud_run_service" "default" {
       }
     }
   }
-  # Service account assignment not supported yet...
 
   lifecycle {
     ignore_changes = [
       template[0].spec[0].containers[0].resources,
     ]
   }
+}
+
+data "google_iam_policy" "noauth" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  location = google_cloud_run_service.default.location
+  project  = google_cloud_run_service.default.project
+  service  = google_cloud_run_service.default.name
+
+  policy_data = data.google_iam_policy.noauth.policy_data
+}
+
+output "app_url" {
+  value = "export VAULT_ADDR=\"${google_cloud_run_service.default.status[0].url}\""
 }
