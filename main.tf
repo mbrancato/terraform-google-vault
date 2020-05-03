@@ -71,7 +71,7 @@ resource "google_kms_key_ring_iam_member" "vault" {
 
 resource "google_cloud_run_service" "default" {
   name     = var.name
-  location = "us-central1"
+  location = var.location
 
   metadata {
     namespace = var.project
