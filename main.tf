@@ -126,5 +126,5 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
 }
 
 output "app_url" {
-  value = "export VAULT_ADDR=\"${google_cloud_run_service.default.status[0].url}\""
+  value = google_cloud_run_service.default.status[0].url
 }
