@@ -1,0 +1,27 @@
+name: Terraform Checks
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  terraform_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+    - name: Terraform Format   
+      uses: hashicorp/terraform@0.12.24
+      with:
+        args: fmt -recursive -check
+    - name: Terraform Init
+      uses: hashicorp/terraform@0.12.24
+      with:
+        args: init -backend=false
+    - name: Terraform Validate
+      uses: hashicorp/terraform@0.12.24
+      with:
+        args: validate
