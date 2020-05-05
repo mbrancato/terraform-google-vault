@@ -24,7 +24,8 @@ locals {
           "address" : "0.0.0.0:8080",
           "tls_disable" : "1"
         }
-      }
+      },
+      "ui" : "${var.vault_ui}"
     }
   )
 }
@@ -40,7 +41,8 @@ resource "google_service_account" "vault" {
 }
 
 resource "google_storage_bucket" "vault" {
-  name = "${var.name}-${lower(random_id.vault.hex)}-bucket"
+  name          = "${var.name}-${lower(random_id.vault.hex)}-bucket"
+  force_destroy = var.bucket_force_destroy
 }
 
 resource "google_storage_bucket_iam_member" "member" {
