@@ -82,7 +82,7 @@ resource "google_cloud_run_service" "default" {
   template {
     spec {
       service_account_name  = google_service_account.vault.email
-      container_concurrency = 1
+      container_concurrency = 50
       containers {
         # Specifying args seems to require the command / entrypoint
         image   = var.vault_image
