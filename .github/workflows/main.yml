@@ -5,10 +5,13 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  watch:
+    types: [started]
 
 jobs:
   terraform_checks:
     runs-on: ubuntu-latest
+    if: github.actor == github.event.repository.owner.login
 
     steps:
     - name: Checkout Repo
