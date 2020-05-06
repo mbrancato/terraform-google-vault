@@ -17,14 +17,14 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v2
     - name: Terraform Format   
-      uses: hashicorp/terraform:0.12.24
+      uses: 'hashicorp/terraform:0.12.24'
       with:
         args: fmt -recursive -check
     - name: Terraform Init
-      uses: hashicorp/terraform:0.12.24
+      uses: 'hashicorp/terraform:0.12.24'
       with:
         args: init -backend=false
     - name: Terraform Validate
-      uses: hashicorp/terraform:0.12.24
+      uses: 'hashicorp/terraform:0.12.24'
       with:
         args: validate
