@@ -98,7 +98,13 @@ resource "google_cloud_run_service" "default" {
           name  = "VAULT_LOCAL_CONFIG"
           value = local.vault_config
         }
-
+        resources {
+          limits = {
+            "cpu"    = "1000m"
+            "memory" = "256Mi"
+          }
+          requests = {}
+        }
       }
     }
   }
