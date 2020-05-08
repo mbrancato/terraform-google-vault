@@ -13,8 +13,7 @@ variable "project" {
   type        = string
 }
 
-variable "vault_version" {
-  description = "Vault version to run"
+variable "vault_image" {
+  description = "Vault docker image i.e. us.gcr.io/vault-226618/vault:latest"
   type        = string
-  default     = "1.2.0"
 }

@@ -16,25 +16,6 @@ following Google Cloud resources:
 
 **PLEASE READ**
 
-Cloud Run is a beta service on Google Cloud and the APIs are not complete. In
-addition, the Terraform provider doesn't have support for everything needed.
-Some tasks must be done manually.
-
-### Service Account
-
-The Cloud Run deployment revision will be configured to use the Compute
-Engine default service account. The KMS IAM roles needed are granted to a new
-Vault service account and Terraform cannot yet assign this service account to
-Cloud Run. A new deployment revision will need to manually be created in the
-Google Cloud console and specify the Vault service account.
-
-### Service IAM
-
-To allow unauthenticated HTTP requests to hit the Vault container, the Cloud
-Run Invoker (role/run.invoker) must be assigned to 'allUsers' for the Cloud Run
-Service. Terraform cannot currently do this so it must be assigned manually in
-the Google Cloud console.
-
 ### Goole Cloud Container Registry
 
 Cloud Run will only run containers hosted on `gcr.io` (GCR) and its subdomains.
@@ -44,11 +25,6 @@ is automatically created using `docker push`. Read the
 [documentation](https://cloud.google.com/container-registry/docs/pushing-and-pulling)
 for more details on pushing containers to GCR.
 
-### Vault URL
-
-Currently the Cloud Run resource does not return the URL where the app is
-hosted. This needs to be gathered manually from the Google Cloud console.
-
 ## Getting Started
 
 To get started, a Google Cloud Project is needed. This should be created ahead
@@ -57,7 +33,7 @@ project ID is provided to the module invocation and a basic implementation
 would look like the following:
 
 ```hcl
-provider "google-beta" {}
+provider "google" {}
 
 module "vault" {
   source   = "github.com/mbrancato/terraform-google-vault"
