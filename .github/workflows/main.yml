@@ -16,15 +16,15 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
-    - name: Terraform Format   
-      uses: 'hashicorp/terraform:0.12.24'
-      with:
-        args: fmt -recursive -check
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Format
+      run: terraform fmt -check -recursive
+
     - name: Terraform Init
-      uses: 'hashicorp/terraform:0.12.24'
-      with:
-        args: init -backend=false
+      run: terraform init -backend=false
+
     - name: Terraform Validate
-      uses: 'hashicorp/terraform:0.12.24'
-      with:
-        args: validate
+      run: terraform validate
