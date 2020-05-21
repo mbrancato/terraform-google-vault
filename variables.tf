@@ -19,7 +19,7 @@ variable "vault_image" {
 }
 
 variable "bucket_force_destroy" {
-  description = "CAUTION: Set force_destroy for Storage Bucket. This is where the vault data is stored."
+  description = "CAUTION: Set force_destroy for Storage Bucket. This is where the vault data is stored. Setting this to true will allow terraform destroy to delete the bucket."
   type        = bool
   default     = false
 }
