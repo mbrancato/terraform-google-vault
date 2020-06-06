@@ -81,9 +81,14 @@ resource "google_cloud_run_service" "default" {
   }
 
   template {
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/maxScale" = 1 # HA not Supported
+      }
+    }
     spec {
       service_account_name  = google_service_account.vault.email
-      container_concurrency = 1
+      container_concurrency = var.container_concurrency
       containers {
         # Specifying args seems to require the command / entrypoint
         image   = var.vault_image
@@ -99,6 +104,11 @@ resource "google_cloud_run_service" "default" {
           name  = "VAULT_LOCAL_CONFIG"
           value = local.vault_config
         }
+
+        env {
+          name  = "VAULT_API_ADDR"
+          value = var.vault_api_addr
+        }
         resources {
           limits = {
             "cpu"    = "1000m"
@@ -108,12 +118,6 @@ resource "google_cloud_run_service" "default" {
         }
       }
     }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      template[0].spec[0].containers[0].resources,
-    ]
   }
 }
 
