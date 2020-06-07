@@ -24,7 +24,8 @@ locals {
           "address" : "0.0.0.0:8080",
           "tls_disable" : "1"
         }
-      }
+      },
+      "ui" : "${var.vault_ui}"
     }
   )
 }
@@ -40,7 +41,8 @@ resource "google_service_account" "vault" {
 }
 
 resource "google_storage_bucket" "vault" {
-  name = "${var.name}-${lower(random_id.vault.hex)}-bucket"
+  name          = "${var.name}-${lower(random_id.vault.hex)}-bucket"
+  force_destroy = var.bucket_force_destroy
 }
 
 resource "google_storage_bucket_iam_member" "member" {
@@ -70,8 +72,9 @@ resource "google_kms_key_ring_iam_member" "vault" {
 }
 
 resource "google_cloud_run_service" "default" {
-  name     = var.name
-  location = var.location
+  name                       = var.name
+  location                   = var.location
+  autogenerate_revision_name = true
 
   metadata {
     namespace = var.project
@@ -96,7 +99,13 @@ resource "google_cloud_run_service" "default" {
           name  = "VAULT_LOCAL_CONFIG"
           value = local.vault_config
         }
-
+        resources {
+          limits = {
+            "cpu"    = "1000m"
+            "memory" = "256Mi"
+          }
+          requests = {}
+        }
       }
     }
   }
