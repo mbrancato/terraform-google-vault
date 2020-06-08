@@ -29,3 +29,15 @@ variable "vault_ui" {
   type        = bool
   default     = false
 }
+
+variable "container_concurrency" {
+  description = "Max number of connections per container instance."
+  type        = number
+  default     = 80 # Max per Cloud Run Documentation
+}
+
+variable "vault_api_addr" {
+  description = "Full HTTP endpoint of Vault Server if using a custom domain name. Leave blank otherwise."
+  type        = string
+  default     = ""
+}
