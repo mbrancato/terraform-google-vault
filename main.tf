@@ -3,29 +3,29 @@ provider "random" {}
 locals {
   vault_config = jsonencode(
     {
-      "storage" : {
-        "gcs" : {
-          "bucket" : google_storage_bucket.vault.name
+      "storage" = {
+        "gcs" = {
+          "bucket" = google_storage_bucket.vault.name
         }
       },
-      "seal" : {
-        "gcpckms" : {
-          "project" : var.project,
-          "region" : var.location,
-          "key_ring" : var.vault_kms_keyring_name,
-          "crypto_key" : google_kms_crypto_key.vault.name
+      "seal" = {
+        "gcpckms" = {
+          "project"    = var.project,
+          "region"     = var.location,
+          "key_ring"   = var.vault_kms_keyring_name,
+          "crypto_key" = google_kms_crypto_key.vault.name
         }
       },
-      "default_lease_ttl" : "168h",
-      "max_lease_ttl" : "720h",
-      "disable_mlock" : "true",
-      "listener" : {
-        "tcp" : {
-          "address" : "0.0.0.0:8080",
-          "tls_disable" : "1"
+      "default_lease_ttl" = "168h",
+      "max_lease_ttl"     = "720h",
+      "disable_mlock"     = "true",
+      "listener" = {
+        "tcp" = {
+          "address"     = "0.0.0.0:8080",
+          "tls_disable" = "1"
         }
       },
-      "ui" : var.vault_ui
+      "ui" = var.vault_ui
     }
   )
   vault_kms_keyring_name    = var.vault_kms_keyring_name != "" ? var.vault_kms_keyring_name : "${var.name}-${lower(random_id.vault.hex)}-kr"
