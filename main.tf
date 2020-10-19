@@ -5,14 +5,14 @@ locals {
     {
       "storage" = {
         "gcs" = {
-          "bucket" = google_storage_bucket.vault.name
+          "bucket" = local.vault_storage_bucket_name
         }
       },
       "seal" = {
         "gcpckms" = {
           "project"    = var.project,
           "region"     = var.location,
-          "key_ring"   = var.vault_kms_keyring_name,
+          "key_ring"   = local.vault_kms_keyring_name,
           "crypto_key" = google_kms_crypto_key.vault.name
         }
       },
