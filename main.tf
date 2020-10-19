@@ -5,7 +5,7 @@ locals {
     {
       "storage" = {
         "gcs" = {
-          "bucket" = local.vault_storage_bucket_name
+          "bucket"     = local.vault_storage_bucket_name
           "ha_enabled" = "false"
         }
       },
