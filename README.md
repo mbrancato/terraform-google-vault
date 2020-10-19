@@ -35,11 +35,14 @@ would look like the following:
 ```hcl
 provider "google" {}
 
-module "vault" {
-  source   = "github.com/mbrancato/terraform-google-vault"
+data "google_client_config" "current" {}
+
+module "vault`
+source   = "git::https://github.com/mbrancato/terraform-google-vault.git"
   name     = "vault"
-  project  = "vault-543676"
-  location = "us-central1"
+  project = data.google_client_config.current.project
+  location = data.google_client_config.current.region
+  vault_image = "us.gcr.io/${data.google_client_config.current.project}/vault:1.5.4"
 }
 ```
 
@@ -93,6 +96,52 @@ configuration and unseal keys are configured. When restarting, the Vault should
 unseal itself automatically using the Google KMS. For more information on
 deploying Vault, read
 [Deploy Vault](https://learn.hashicorp.com/vault/getting-started/deploy).
+
+## Variables
+
+### `name`
+- Application name.
+
+### `location`
+- Google location where resources are to be created.
+
+### `project`
+- Google project ID.
+
+### `vault_image`
+- Vault docker image.
+
+### `bucket_force_destroy`
+- CAUTION: Set force_destroy for Storage Bucket. This is where the vault data is stored. Setting this to true will allow terraform destroy to delete the bucket.
+  - default - `false`
+
+### `vault_ui`
+- Enable Vault UI.
+  - default - `false`
+
+### `container_concurrency`
+- Max number of connections per container instance.
+  - default - `80`
+
+### `vault_api_addr`
+- Full HTTP endpoint of Vault Server if using a custom domain name. Leave blank otherwise.
+  - default - `""`
+
+### `vault_kms_keyring_name`
+- Name of the Google KMS keyring to use.
+  - default - `"${var.name}-${lower(random_id.vault.hex)}-kr"`
+
+### `vault_kms_key_rotation`
+- The period for KMS key rotation.
+  - default - `"86400s"`
+
+### `vault_service_account_id`
+- ID for the service account to be used. This is the part of the service account email before the `@` symbol.
+  - default - `"vault-sa"`
+
+### `vault_storage_bucket_name`
+- Storage bucket name to be used.
+  - default - `"${var.name}-${lower(random_id.vault.hex)}-bucket"`
 
 ## Security Concerns
 
