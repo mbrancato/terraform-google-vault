@@ -12,19 +12,27 @@ following Google Cloud resources:
 * Google Cloud Storage
 * Google Cloud Key Management Service
 
-## Caveats
+---
+## Table of Contents
 
-**PLEASE READ**
-
-### Goole Cloud Container Registry
-
-Cloud Run will only run containers hosted on `gcr.io` (GCR) and its subdomains.
-This means that the Vault container will need to be pushed to GCR in the Google
-Cloud Project. Terraform cannot currently create the container registry and it
-is automatically created using `docker push`. Read the
-[documentation](https://cloud.google.com/container-registry/docs/pushing-and-pulling)
-for more details on pushing containers to GCR.
-
+- [Getting Started](#getting-started)
+- [Variables](#variables)
+  - [`name`](#name)
+  - [`location`](#location)
+  - [`project`](#project)
+  - [`vault_image`](#vault_image)
+  - [`bucket_force_destroy`](#bucket_force_destroy)
+  - [`vault_ui`](#vault_ui)
+  - [`container_concurrency`](#container_concurrency)
+  - [`vault_api_addr`](#vault_api_addr)
+  - [`vault_kms_keyring_name`](#vault_kms_keyring_name)
+  - [`vault_kms_key_rotation`](#vault_kms_key_rotation)
+  - [`vault_service_account_id`](#vault_service_account_id)
+  - [`vault_storage_bucket_name`](#vault_storage_bucket_name)
+- [Security Concerns](#security-concerns)
+- [Caveats](#caveats)
+  - [Google Cloud Container Registry](#google-cloud-container-registry)
+  
 ## Getting Started
 
 To get started, a Google Cloud Project is needed. This should be created ahead
@@ -35,11 +43,14 @@ would look like the following:
 ```hcl
 provider "google" {}
 
-module "vault" {
-  source   = "github.com/mbrancato/terraform-google-vault"
+data "google_client_config" "current" {}
+
+module "vault`
+source   = "git::https://github.com/mbrancato/terraform-google-vault.git"
   name     = "vault"
-  project  = "vault-543676"
-  location = "us-central1"
+  project = data.google_client_config.current.project
+  location = data.google_client_config.current.region
+  vault_image = "us.gcr.io/${data.google_client_config.current.project}/vault:1.5.4"
 }
 ```
 
@@ -94,9 +105,77 @@ unseal itself automatically using the Google KMS. For more information on
 deploying Vault, read
 [Deploy Vault](https://learn.hashicorp.com/vault/getting-started/deploy).
 
+## Variables
+
+### `name`
+- Application name.
+
+### `location`
+- Google location where resources are to be created.
+
+### `project`
+- Google project ID.
+
+### `vault_image`
+- Vault docker image.
+
+### `bucket_force_destroy`
+- CAUTION: Set force_destroy for Storage Bucket. This is where the vault data is stored. Setting this to true will allow terraform destroy to delete the bucket.
+  - default - `false`
+
+### `vault_ui`
+- Enable Vault UI.
+  - default - `false`
+
+### `container_concurrency`
+- Max number of connections per container instance.
+  - default - `80`
+
+### `vault_api_addr`
+- Full HTTP endpoint of Vault Server if using a custom domain name. Leave blank otherwise.
+  - default - `""`
+
+### `vault_kms_keyring_name`
+- Name of the Google KMS keyring to use.
+  - default - `"${var.name}-${lower(random_id.vault.hex)}-kr"`
+
+### `vault_kms_key_rotation`
+- The period for KMS key rotation.
+  - default - `"86400s"`
+
+### `vault_service_account_id`
+- ID for the service account to be used. This is the part of the service account email before the `@` symbol.
+  - default - `"vault-sa"`
+
+### `vault_storage_bucket_name`
+- Storage bucket name to be used.
+  - default - `"${var.name}-${lower(random_id.vault.hex)}-bucket"`
+
 ## Security Concerns
 
 The following things may be of concern from a security perspective:
 
 * This is a publicly accessible Vault instance. Anyone with the DNS name can connect to it.
 * By default, Vault is running on shared compute infrastructure.
+
+## Caveats
+
+**PLEASE READ**
+
+### Google Cloud Container Registry
+
+Cloud Run will only run containers hosted on `gcr.io` (GCR) and its subdomains.
+This means that the Vault container will need to be pushed to GCR in the Google
+Cloud Project. Terraform cannot currently create the container registry and it
+is automatically created using `docker push`. Read the
+[documentation](https://cloud.google.com/container-registry/docs/pushing-and-pulling)
+for more details on pushing containers to GCR.
+
+A quick way to get Vault into GCR for a GCP project:
+
+```
+gcloud auth configure-docker
+docker pull hashicorp/vault:latest
+docker tag hashicorp/vault:latest gcr.io/{{ project_id }}/vault:latest
+docker push gcr.io/{{ project_id }}/vault:latest
+```

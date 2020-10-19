@@ -3,31 +3,34 @@ provider "random" {}
 locals {
   vault_config = jsonencode(
     {
-      "storage" : {
-        "gcs" : {
-          "bucket" : "${google_storage_bucket.vault.name}"
+      "storage" = {
+        "gcs" = {
+          "bucket"     = local.vault_storage_bucket_name
+          "ha_enabled" = "false"
         }
       },
-      "seal" : {
-        "gcpckms" : {
-          "project" : "${var.project}",
-          "region" : "${var.location}",
-          "key_ring" : "${google_kms_key_ring.vault.name}",
-          "crypto_key" : "${google_kms_crypto_key.vault.name}"
+      "seal" = {
+        "gcpckms" = {
+          "project"    = var.project,
+          "region"     = var.location,
+          "key_ring"   = local.vault_kms_keyring_name,
+          "crypto_key" = google_kms_crypto_key.vault.name
         }
       },
-      "default_lease_ttl" : "168h",
-      "max_lease_ttl" : "720h",
-      "disable_mlock" : "true",
-      "listener" : {
-        "tcp" : {
-          "address" : "0.0.0.0:8080",
-          "tls_disable" : "1"
+      "default_lease_ttl" = "168h",
+      "max_lease_ttl"     = "720h",
+      "disable_mlock"     = "true",
+      "listener" = {
+        "tcp" = {
+          "address"     = "0.0.0.0:8080",
+          "tls_disable" = "1"
         }
       },
-      "ui" : "${var.vault_ui}"
+      "ui" = var.vault_ui
     }
   )
+  vault_kms_keyring_name    = var.vault_kms_keyring_name != "" ? var.vault_kms_keyring_name : "${var.name}-${lower(random_id.vault.hex)}-kr"
+  vault_storage_bucket_name = var.vault_storage_bucket_name != "" ? var.vault_storage_bucket_name : "${var.name}-${lower(random_id.vault.hex)}-bucket"
 }
 
 
@@ -36,7 +39,7 @@ resource "random_id" "vault" {
 }
 
 resource "google_service_account" "vault" {
-  account_id   = "vault-sa"
+  account_id   = var.vault_service_account_id
   display_name = "Vault Service Account for KMS auto-unseal"
 }
 
@@ -53,7 +56,7 @@ resource "google_storage_bucket_iam_member" "member" {
 
 # Create a KMS key ring
 resource "google_kms_key_ring" "vault" {
-  name     = "${var.name}-${lower(random_id.vault.hex)}-kr"
+  name     = local.vault_kms_keyring_name
   location = var.location
 }
 
@@ -61,7 +64,7 @@ resource "google_kms_key_ring" "vault" {
 resource "google_kms_crypto_key" "vault" {
   name            = "${var.name}-key"
   key_ring        = google_kms_key_ring.vault.self_link
-  rotation_period = "86400s"
+  rotation_period = var.vault_kms_key_rotation
 }
 
 # Add the service account to the Keyring
