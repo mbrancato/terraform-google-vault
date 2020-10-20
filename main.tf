@@ -44,7 +44,7 @@ resource "google_service_account" "vault" {
 }
 
 resource "google_storage_bucket" "vault" {
-  name          = "${var.name}-${lower(random_id.vault.hex)}-bucket"
+  name          = local.vault_storage_bucket_name
   force_destroy = var.bucket_force_destroy
 }
 
