@@ -87,6 +87,7 @@ resource "google_cloud_run_service" "default" {
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale" = 1 # HA not Supported
+        "run.googleapis.com/launch-stage"  = "BETA"
       }
     }
     spec {
