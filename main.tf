@@ -124,6 +124,20 @@ resource "google_cloud_run_service" "default" {
   }
 }
 
+resource "google_cloud_run_domain_mapping" "default" {
+  count    = var.vault_api_addr != "" ? 1 : 0
+  location = var.location
+  name     = var.vault_api_addr
+
+  metadata {
+    namespace = var.project
+  }
+
+  spec {
+    route_name = google_cloud_run_service.default.name
+  }
+}
+
 data "google_iam_policy" "noauth" {
   binding {
     role = "roles/run.invoker"
