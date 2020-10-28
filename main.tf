@@ -127,7 +127,7 @@ resource "google_cloud_run_service" "default" {
 resource "google_cloud_run_domain_mapping" "default" {
   count    = var.vault_api_addr != "" ? 1 : 0
   location = var.location
-  name     = var.vault_api_addr
+  name     = replace(var.vault_api_addr, "https://", "")
 
   metadata {
     namespace = var.project
