@@ -45,11 +45,15 @@ provider "google" {}
 
 data "google_client_config" "current" {}
 
-module "vault`
-source   = "git::https://github.com/mbrancato/terraform-google-vault.git"
-  name     = "vault"
-  project = data.google_client_config.current.project
-  location = data.google_client_config.current.region
+module "vault" {
+  providers = {
+    google = google
+  }
+
+  source      = "git::https://github.com/mbrancato/terraform-google-vault.git"
+  name        = "vault"
+  project     = data.google_client_config.current.project
+  location    = data.google_client_config.current.region
   vault_image = "us.gcr.io/${data.google_client_config.current.project}/vault:1.5.4"
 }
 ```
