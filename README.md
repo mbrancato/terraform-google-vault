@@ -21,17 +21,17 @@ following Google Cloud resources:
   - [`location`](#location)
   - [`project`](#project)
   - [`vault_image`](#vault_image)
-  - [`bucket_force_destroy`](#bucket_force_destroy)
-  - [`container_concurrency`](#container_concurrency)
-  - [`vpc_connector`](#vpc_connector)
-  - [`vault_ui`](#vault_ui)
-  - [`vault_api_addr`](#vault_api_addr)
-  - [`vault_kms_keyring_name`](#vault_kms_keyring_name)
-  - [`vault_kms_key_rotation`](#vault_kms_key_rotation)
-  - [`vault_kms_key_algorithm`](#vault_kms_key_algorithm)
-  - [`vault_kms_key_protection_level`](#vault_kms_key_protection_level)
-  - [`vault_service_account_id`](#vault_service_account_id)
-  - [`vault_storage_bucket_name`](#vault_storage_bucket_name)
+  - [`bucket_force_destroy`](#bucket_force_destroy-optional)
+  - [`container_concurrency`](#container_concurrency-optional)
+  - [`vpc_connector`](#vpc_connector-optional)
+  - [`vault_ui`](#vault_ui-optional)
+  - [`vault_api_addr`](#vault_api_addr-optional)
+  - [`vault_kms_keyring_name`](#vault_kms_keyring_name-optional)
+  - [`vault_kms_key_rotation`](#vault_kms_key_rotation-optional)
+  - [`vault_kms_key_algorithm`](#vault_kms_key_algorithm-optional)
+  - [`vault_kms_key_protection_level`](#vault_kms_key_protection_level-optional)
+  - [`vault_service_account_id`](#vault_service_account_id-optional)
+  - [`vault_storage_bucket_name`](#vault_storage_bucket_name-optional)
 - [Security Concerns](#security-concerns)
 - [Caveats](#caveats)
   - [Google Cloud Container Registry](#google-cloud-container-registry)
@@ -178,8 +178,8 @@ deploying Vault, read
 
 The following things may be of concern from a security perspective:
 
-* If not using a VPC connector, this is a publicly accessible Vault instance. Anyone with the DNS name can connect to it.
-* By default, Vault is running on shared compute infrastructure.
+* When not using a VPC connector, this is a publicly accessible Vault instance. Anyone with the DNS name can connect to it.
+* By default, Vault is running on shared compute infrastructure. The [Google Terraform provider](https://github.com/hashicorp/terraform-provider-google) does not yet support Cloud Run on Anthos / GKE to deploy on dedicated VMs.
 
 ## Caveats
 
