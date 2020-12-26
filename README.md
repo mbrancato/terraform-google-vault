@@ -57,7 +57,7 @@ module "vault" {
   name        = "vault"
   project     = data.google_client_config.current.project
   location    = data.google_client_config.current.region
-  vault_image = "us.gcr.io/${data.google_client_config.current.project}/vault:1.5.4"
+  vault_image = "us.gcr.io/${data.google_client_config.current.project}/vault:1.6.1"
 }
 ```
 
@@ -137,7 +137,7 @@ deploying Vault, read
 ### `vpc_connector` (optional)
 - ID for the [Serverless VPC connector](https://cloud.google.com/vpc/docs/configure-serverless-vpc-access) to be used, if any, for private VPC access.
   - Creation of the connector is out of scope of this module, see [google_vpc_access_connector](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/vpc_access_connector).
-  - default - `""`
+  - default - `null`
 
 ### `vault_ui` (optional)
 - Enable Vault UI.
