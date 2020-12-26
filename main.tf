@@ -1,5 +1,3 @@
-provider "random" {}
-
 locals {
   vault_config = jsonencode(
     {
@@ -33,18 +31,19 @@ locals {
   vault_storage_bucket_name = var.vault_storage_bucket_name != "" ? var.vault_storage_bucket_name : "${var.name}-${lower(random_id.vault.hex)}-bucket"
 }
 
-
 resource "random_id" "vault" {
   byte_length = 2
 }
 
 resource "google_service_account" "vault" {
+  project      = var.project
   account_id   = var.vault_service_account_id
   display_name = "Vault Service Account for KMS auto-unseal"
 }
 
 resource "google_storage_bucket" "vault" {
   name          = local.vault_storage_bucket_name
+  project       = var.project
   force_destroy = var.bucket_force_destroy
 }
 
@@ -57,6 +56,7 @@ resource "google_storage_bucket_iam_member" "member" {
 # Create a KMS key ring
 resource "google_kms_key_ring" "vault" {
   name     = local.vault_kms_keyring_name
+  project  = var.project
   location = var.location
 }
 
@@ -65,6 +65,11 @@ resource "google_kms_crypto_key" "vault" {
   name            = "${var.name}-key"
   key_ring        = google_kms_key_ring.vault.self_link
   rotation_period = var.vault_kms_key_rotation
+
+  version_template {
+    algorithm        = var.vault_kms_key_algorithm
+    protection_level = var.vault_kms_key_protection_level
+  }
 }
 
 # Add the service account to the Keyring
@@ -76,6 +81,7 @@ resource "google_kms_key_ring_iam_member" "vault" {
 
 resource "google_cloud_run_service" "default" {
   name                       = var.name
+  project                    = var.project
   location                   = var.location
   autogenerate_revision_name = true
 
@@ -86,7 +92,8 @@ resource "google_cloud_run_service" "default" {
   template {
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale" = 1 # HA not Supported
+        "autoscaling.knative.dev/maxScale"        = 1 # HA not Supported
+        "run.googleapis.com/vpc-access-connector" = var.vpc_connector != "" ? var.vpc_connector : null
       }
     }
     spec {
