@@ -179,7 +179,7 @@ deploying Vault, read
 The following things may be of concern from a security perspective:
 
 * When not using a VPC connector, this is a publicly accessible Vault instance. Anyone with the DNS name can connect to it.
-* By default, Vault is running on shared compute infrastructure. The [Google Terraform provider](https://github.com/hashicorp/terraform-provider-google) does not yet support Cloud Run on Anthos / GKE to deploy on dedicated VMs.
+* By default, Vault is running on shared compute infrastructure. The [Google Terraform provider](https://github.com/hashicorp/terraform-provider-google) does not yet support Cloud Run on Anthos / GKE to deploy on single-tenant VMs.
 
 ## Caveats
 
