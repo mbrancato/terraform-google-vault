@@ -158,7 +158,7 @@ deploying Vault, read
 
 ### `vault_kms_key_algorithm` (optional)
 - The cryptographic algorithm to be used with the KMS key.
-  - Specify a supported (CryptoKeyVersionAlgorithm)[https://cloud.google.com/kms/docs/reference/rest/v1/CryptoKeyVersionAlgorithm] value.
+  - Specify a supported [CryptoKeyVersionAlgorithm](https://cloud.google.com/kms/docs/reference/rest/v1/CryptoKeyVersionAlgorithm) value.
   - default - `"GOOGLE_SYMMETRIC_ENCRYPTION"`
 
 ### `vault_kms_key_protection_level` (optional)
