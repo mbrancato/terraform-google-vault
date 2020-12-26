@@ -1,5 +1,3 @@
-provider "random" {}
-
 locals {
   vault_config = jsonencode(
     {
@@ -32,7 +30,6 @@ locals {
   vault_kms_keyring_name    = var.vault_kms_keyring_name != "" ? var.vault_kms_keyring_name : "${var.name}-${lower(random_id.vault.hex)}-kr"
   vault_storage_bucket_name = var.vault_storage_bucket_name != "" ? var.vault_storage_bucket_name : "${var.name}-${lower(random_id.vault.hex)}-bucket"
 }
-
 
 resource "random_id" "vault" {
   byte_length = 2
