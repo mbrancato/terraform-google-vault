@@ -22,11 +22,14 @@ following Google Cloud resources:
   - [`project`](#project)
   - [`vault_image`](#vault_image)
   - [`bucket_force_destroy`](#bucket_force_destroy)
-  - [`vault_ui`](#vault_ui)
   - [`container_concurrency`](#container_concurrency)
+  - [`vpc_connector`](#vpc_connector)
+  - [`vault_ui`](#vault_ui)
   - [`vault_api_addr`](#vault_api_addr)
   - [`vault_kms_keyring_name`](#vault_kms_keyring_name)
   - [`vault_kms_key_rotation`](#vault_kms_key_rotation)
+  - [`vault_kms_key_algorithm`](#vault_kms_key_algorithm)
+  - [`vault_kms_key_protection_level`](#vault_kms_key_protection_level)
   - [`vault_service_account_id`](#vault_service_account_id)
   - [`vault_storage_bucket_name`](#vault_storage_bucket_name)
 - [Security Concerns](#security-concerns)
@@ -123,35 +126,51 @@ deploying Vault, read
 ### `vault_image`
 - Vault docker image.
 
-### `bucket_force_destroy`
+### `bucket_force_destroy` (optional)
 - CAUTION: Set force_destroy for Storage Bucket. This is where the vault data is stored. Setting this to true will allow terraform destroy to delete the bucket.
   - default - `false`
 
-### `vault_ui`
-- Enable Vault UI.
-  - default - `false`
-
-### `container_concurrency`
+### `container_concurrency` (optional)
 - Max number of connections per container instance.
   - default - `80`
 
-### `vault_api_addr`
+### `vpc_connector` (optional)
+- ID for the [Serverless VPC connector](https://cloud.google.com/vpc/docs/configure-serverless-vpc-access) to be used, if any, for private VPC access.
+  - Creation of the connector is out of scope of this module, see [google_vpc_access_connector](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/vpc_access_connector).
+  - default - `""`
+
+### `vault_ui` (optional)
+- Enable Vault UI.
+  - default - `false`
+
+### `vault_api_addr` (optional)
 - Full HTTP endpoint of Vault Server if using a custom domain name. Leave blank otherwise.
   - default - `""`
 
-### `vault_kms_keyring_name`
+### `vault_kms_keyring_name` (optional)
 - Name of the Google KMS keyring to use.
   - default - `"${var.name}-${lower(random_id.vault.hex)}-kr"`
 
-### `vault_kms_key_rotation`
+### `vault_kms_key_rotation` (optional)
 - The period for KMS key rotation.
-  - default - `"86400s"`
+  - Note: key rotations will lead to multiple active KMS keys and will result in an increasing monthly bill. Setting to `null` should disable rotation (not recommended).
+  - default - `"7776000s"` (90 days)
 
-### `vault_service_account_id`
+### `vault_kms_key_algorithm` (optional)
+- The cryptographic algorithm to be used with the KMS key.
+  - Specify a supported (CryptoKeyVersionAlgorithm)[https://cloud.google.com/kms/docs/reference/rest/v1/CryptoKeyVersionAlgorithm] value.
+  - default - `"GOOGLE_SYMMETRIC_ENCRYPTION"`
+
+### `vault_kms_key_protection_level` (optional)
+- The protection level to be used with the KMS key.
+  - Specify the [protection level](https://cloud.google.com/kms/docs/algorithms#protection_levels) to be used (SOFTWARE, HSM, EXTERNAL).
+  - default - `"SOFTWARE"`
+
+### `vault_service_account_id` (optional)
 - ID for the service account to be used. This is the part of the service account email before the `@` symbol.
   - default - `"vault-sa"`
 
-### `vault_storage_bucket_name`
+### `vault_storage_bucket_name` (optional)
 - Storage bucket name to be used.
   - default - `"${var.name}-${lower(random_id.vault.hex)}-bucket"`
 
@@ -159,7 +178,7 @@ deploying Vault, read
 
 The following things may be of concern from a security perspective:
 
-* This is a publicly accessible Vault instance. Anyone with the DNS name can connect to it.
+* If not using a VPC connector, this is a publicly accessible Vault instance. Anyone with the DNS name can connect to it.
 * By default, Vault is running on shared compute infrastructure.
 
 ## Caveats
@@ -180,6 +199,6 @@ A quick way to get Vault into GCR for a GCP project:
 ```
 gcloud auth configure-docker
 docker pull hashicorp/vault:latest
-docker tag hashicorp/vault:latest gcr.io/{{ project_id }}/vault:latest
-docker push gcr.io/{{ project_id }}/vault:latest
+docker tag hashicorp/vault:1.6.1 gcr.io/{{ project_id }}/vault:1.6.1
+docker push gcr.io/{{ project_id }}/vault:1.6.1
 ```

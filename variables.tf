@@ -24,16 +24,22 @@ variable "bucket_force_destroy" {
   default     = false
 }
 
-variable "vault_ui" {
-  description = "Enable Vault UI."
-  type        = bool
-  default     = false
-}
-
 variable "container_concurrency" {
   description = "Max number of connections per container instance."
   type        = number
   default     = 80 # Max per Cloud Run Documentation
+}
+
+variable "vpc_connector" {
+  description = "Serverless VPC access connector."
+  type        = string
+  default     = ""
+}
+
+variable "vault_ui" {
+  description = "Enable Vault UI."
+  type        = bool
+  default     = false
 }
 
 variable "vault_api_addr" {
@@ -51,7 +57,19 @@ variable "vault_kms_keyring_name" {
 variable "vault_kms_key_rotation" {
   description = "The period for KMS key rotation."
   type        = string
-  default     = "86400s"
+  default     = "7776000s"
+}
+
+variable "vault_kms_key_algorithm" {
+  description = "The cryptographic algorithm to be used with the KMS key."
+  type        = string
+  default     = "GOOGLE_SYMMETRIC_ENCRYPTION"
+}
+
+variable "vault_kms_key_protection_level" {
+  description = "The protection level to be used with the KMS key."
+  type        = string
+  default     = "SOFTWARE"
 }
 
 variable "vault_service_account_id" {
