@@ -94,6 +94,8 @@ resource "google_cloud_run_service" "default" {
       annotations = {
         "autoscaling.knative.dev/maxScale"        = 1 # HA not Supported
         "run.googleapis.com/vpc-access-connector" = var.vpc_connector != "" ? var.vpc_connector : null
+        # Hardcoded here after a change in the Cloud Run API response
+        "run.googleapis.com/sandbox" = "gvisor"
       }
     }
     spec {
@@ -150,4 +152,8 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
 
 output "app_url" {
   value = google_cloud_run_service.default.status[0].url
+}
+
+output "service_account_email" {
+  value = google_service_account.vault.email
 }
