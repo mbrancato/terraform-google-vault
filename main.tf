@@ -44,6 +44,7 @@ resource "google_service_account" "vault" {
 resource "google_storage_bucket" "vault" {
   name          = local.vault_storage_bucket_name
   project       = var.project
+  location      = var.vault_storage_bucket_location
   force_destroy = var.bucket_force_destroy
 }
 
@@ -63,7 +64,7 @@ resource "google_kms_key_ring" "vault" {
 # Create a crypto key for the key ring, rotate daily
 resource "google_kms_crypto_key" "vault" {
   name            = "${var.name}-key"
-  key_ring        = google_kms_key_ring.vault.self_link
+  key_ring        = google_kms_key_ring.vault.id
   rotation_period = var.vault_kms_key_rotation
 
   version_template {

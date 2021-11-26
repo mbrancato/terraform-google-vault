@@ -83,3 +83,9 @@ variable "vault_storage_bucket_name" {
   type        = string
   default     = ""
 }
+
+variable "vault_storage_bucket_location" {
+  description = "The GCS location of the storage bucket"
+  type        = string
+  default     = "US"
+}
